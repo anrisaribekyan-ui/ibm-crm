@@ -4,3 +4,1478 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>iBlackMaster — Заказы</title>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #0a0a0a;
+  --white: #ffffff;
+  --gray-50: #f7f7f7;
+  --gray-100: #f0f0f0;
+  --gray-200: #e2e2e2;
+  --gray-300: #c8c8c8;
+  --gray-400: #a0a0a0;
+  --gray-500: #737373;
+  --gray-600: #525252;
+  --gray-700: #3d3d3d;
+  --gray-800: #242424;
+  --gray-900: #141414;
+  --sidebar-w: 210px;
+  --font: 'Onest', sans-serif;
+  --mono: 'JetBrains Mono', monospace;
+
+  /* REAL STATUS COLORS from LiveSklad */
+  --s-prinyat: #223DD6;
+  --s-v-rabote: #5CB85C;
+  --s-v-paike: #9AD03B;
+  --s-v-perekey: #169672;
+  --s-zhdet: #F0AD4E;
+  --s-klient-opov: #F0AD4E;
+  --s-soglasovat: #CE0ECC;
+  --s-opovest: #FB851A;
+  --s-peredat: #FF8311;
+  --s-gotov-uved: #272729;
+  --s-gotov-zvon: #0C0CFD;
+  --s-zakryt: #8E8E8E;
+  --s-otkaz: #D6D6D6;
+  --s-bez-rem: #D6D6D6;
+}
+
+body { font-family: var(--font); background: var(--gray-50); color: var(--black); display: flex; height: 100vh; overflow: hidden; font-size: 13px; }
+
+/* ─── SIDEBAR ─── */
+.sidebar { width: var(--sidebar-w); background: var(--black); display: flex; flex-direction: column; flex-shrink: 0; height: 100vh; overflow-y: auto; }
+
+.sidebar-logo { padding: 14px 14px 12px; border-bottom: 1px solid #1a1a1a; display: flex; align-items: center; gap: 10px; }
+.logo-mark { width: 30px; height: 30px; background: var(--white); border-radius: 7px; display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 10px; font-weight: 600; color: var(--black); flex-shrink: 0; }
+.logo-text { font-size: 12px; font-weight: 600; color: var(--white); }
+.logo-sub { font-size: 10px; color: var(--gray-600); margin-top: 1px; }
+
+.nav { flex: 1; padding: 6px 0; }
+.nav-item { display: flex; align-items: center; gap: 9px; padding: 7px 14px; color: var(--gray-500); cursor: pointer; transition: all 0.12s; border-left: 2px solid transparent; font-size: 12.5px; }
+.nav-item:hover { color: var(--gray-200); background: #111; }
+.nav-item.active { color: var(--white); border-left-color: var(--white); background: #1a1a1a; font-weight: 500; }
+.nav-item svg { flex-shrink: 0; opacity: 0.6; }
+.nav-item.active svg { opacity: 1; }
+.nav-sub { display: none; }
+.nav-sub.open { display: block; }
+.nav-subitem { padding: 5px 14px 5px 38px; color: var(--gray-600); cursor: pointer; font-size: 11.5px; transition: color 0.12s; display: flex; align-items: center; gap: 6px; }
+.nav-subitem:hover { color: var(--gray-300); }
+.nav-subitem.active { color: var(--white); }
+.nav-subitem::before { content: ''; width: 3px; height: 3px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+
+.sidebar-user { border-top: 1px solid #1a1a1a; padding: 10px 14px; display: flex; align-items: center; gap: 9px; }
+.avatar { width: 28px; height: 28px; border-radius: 50%; background: var(--gray-800); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; color: var(--white); flex-shrink: 0; border: 1px solid var(--gray-700); }
+.avatar-name { font-size: 11.5px; color: var(--white); font-weight: 500; }
+.avatar-role { font-size: 10px; color: var(--gray-600); }
+
+/* ─── MAIN ─── */
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+
+/* ─── TOPBAR ─── */
+.topbar { height: 50px; background: var(--white); border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 10px; padding: 0 18px; flex-shrink: 0; }
+.topbar-title { font-size: 15px; font-weight: 700; color: var(--black); }
+.topbar-pipe { color: var(--gray-300); }
+.topbar-loc { font-size: 12.5px; color: var(--gray-400); }
+.spacer { flex: 1; }
+
+/* ─── TOOLBAR ─── */
+.toolbar { display: flex; align-items: center; gap: 8px; padding: 10px 18px; background: var(--white); border-bottom: 1px solid var(--gray-200); flex-shrink: 0; flex-wrap: wrap; }
+
+.btn { display: inline-flex; align-items: center; gap: 5px; padding: 6px 12px; border-radius: 6px; font-size: 12px; font-family: var(--font); font-weight: 500; cursor: pointer; border: none; white-space: nowrap; transition: all 0.12s; }
+.btn-primary { background: var(--black); color: var(--white); }
+.btn-primary:hover { background: var(--gray-800); }
+.btn-secondary { background: var(--gray-100); color: var(--black); border: 1px solid var(--gray-200); }
+.btn-secondary:hover { background: var(--gray-200); }
+.btn-ghost { background: transparent; color: var(--gray-600); border: 1px solid var(--gray-200); }
+.btn-ghost:hover { background: var(--gray-50); color: var(--black); }
+.btn-sm { padding: 4px 10px; font-size: 11.5px; }
+.btn-danger { background: #fee2e2; color: #dc2626; border: 1px solid #fca5a5; }
+.btn-danger:hover { background: #fca5a5; }
+
+.search-box { display: flex; align-items: center; gap: 7px; padding: 5px 11px; background: var(--gray-50); border: 1px solid var(--gray-200); border-radius: 6px; width: 220px; }
+.search-box input { background: none; border: none; outline: none; font-family: var(--font); font-size: 12.5px; color: var(--black); width: 100%; }
+.search-box input::placeholder { color: var(--gray-400); }
+
+.filter-tabs { display: flex; gap: 0; }
+.filter-tab { padding: 5px 12px; font-size: 12px; font-family: var(--font); font-weight: 500; cursor: pointer; background: var(--white); color: var(--gray-500); border: 1px solid var(--gray-200); border-right: none; transition: all 0.12s; }
+.filter-tab:first-child { border-radius: 6px 0 0 6px; }
+.filter-tab:last-child { border-radius: 0 6px 6px 0; border-right: 1px solid var(--gray-200); }
+.filter-tab.active { background: var(--black); color: var(--white); border-color: var(--black); }
+.filter-tab:hover:not(.active) { background: var(--gray-100); }
+
+select.filter-sel { padding: 5px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-family: var(--font); font-size: 12px; color: var(--gray-600); background: var(--white); outline: none; cursor: pointer; }
+
+/* ─── TABLE ─── */
+.table-wrap { flex: 1; overflow-y: auto; background: var(--white); }
+
+table { width: 100%; border-collapse: collapse; }
+thead th { padding: 9px 12px; text-align: left; font-size: 10.5px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1px solid var(--gray-200); background: var(--gray-50); white-space: nowrap; cursor: pointer; user-select: none; position: sticky; top: 0; z-index: 1; }
+thead th:hover { color: var(--black); }
+thead th.sort-asc::after { content: ' ↑'; }
+thead th.sort-desc::after { content: ' ↓'; }
+
+tbody tr { border-bottom: 1px solid var(--gray-100); cursor: pointer; transition: background 0.08s; }
+tbody tr:hover { background: #fafafa; }
+tbody tr.selected { background: #f0f4ff; }
+tbody td { padding: 9px 12px; font-size: 12.5px; color: var(--gray-700); vertical-align: middle; }
+
+.order-num { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--black); }
+.order-date { font-family: var(--mono); font-size: 11px; color: var(--gray-400); }
+.device-cell { font-size: 12.5px; font-weight: 500; color: var(--black); }
+.device-type { font-size: 11px; color: var(--gray-400); margin-top: 1px; }
+
+/* ─── STATUS BADGES ─── */
+.status-badge { display: inline-flex; align-items: center; padding: 3px 8px; border-radius: 5px; font-size: 11px; font-weight: 600; white-space: nowrap; color: var(--white); }
+.status-badge.light { color: var(--gray-700); }
+
+/* ─── TABLE FOOTER ─── */
+.table-footer { padding: 8px 12px; background: var(--gray-50); border-top: 1px solid var(--gray-200); display: flex; align-items: center; gap: 12px; font-size: 11.5px; color: var(--gray-500); flex-shrink: 0; flex-wrap: wrap; }
+.status-legend { display: flex; gap: 10px; flex-wrap: wrap; }
+.legend-item { display: flex; align-items: center; gap: 5px; font-size: 11px; }
+.legend-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+.pagination { display: flex; gap: 3px; margin-left: auto; }
+.page-btn { width: 26px; height: 26px; display: flex; align-items: center; justify-content: center; border: 1px solid var(--gray-200); border-radius: 5px; font-size: 11.5px; cursor: pointer; background: var(--white); color: var(--gray-600); transition: all 0.12s; font-family: var(--mono); }
+.page-btn.active { background: var(--black); color: var(--white); border-color: var(--black); }
+.page-btn:hover:not(.active) { background: var(--gray-100); }
+
+/* ─── PANEL ─── */
+.overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.25); z-index: 99; backdrop-filter: blur(1px); }
+.overlay.open { display: block; }
+
+.panel { position: fixed; top: 0; right: -620px; width: 620px; height: 100vh; background: var(--white); border-left: 1px solid var(--gray-200); z-index: 100; display: flex; flex-direction: column; transition: right 0.28s cubic-bezier(0.4,0,0.2,1); box-shadow: -6px 0 32px rgba(0,0,0,0.08); }
+.panel.open { right: 0; }
+
+.panel-head { padding: 12px 16px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.panel-title { font-size: 14px; font-weight: 700; color: var(--black); }
+.panel-close { width: 24px; height: 24px; cursor: pointer; color: var(--gray-400); display: flex; align-items: center; justify-content: center; border-radius: 4px; transition: all 0.12s; }
+.panel-close:hover { background: var(--gray-100); color: var(--black); }
+
+.panel-tabs { display: flex; border-bottom: 1px solid var(--gray-200); flex-shrink: 0; background: var(--gray-50); }
+.panel-tab { padding: 9px 16px; font-size: 12.5px; color: var(--gray-500); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.12s; display: flex; align-items: center; gap: 6px; font-weight: 500; }
+.panel-tab.active { color: var(--black); border-bottom-color: var(--black); background: var(--white); }
+.panel-tab:hover:not(.active) { color: var(--gray-700); }
+
+.panel-body { display: flex; flex: 1; overflow: hidden; }
+.panel-form { flex: 1; overflow-y: auto; padding: 16px; }
+.panel-form.hidden { display: none; }
+
+/* ─── FORM FIELDS ─── */
+.fsection { margin-bottom: 18px; }
+.fsection-title { font-size: 9.5px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 10px; padding-bottom: 5px; border-bottom: 1px solid var(--gray-100); display: flex; align-items: center; gap: 6px; }
+.frow { display: grid; gap: 8px; margin-bottom: 8px; }
+.frow.cols-2 { grid-template-columns: 1fr 1fr; }
+.frow.cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+.frow.cols-1 { grid-template-columns: 1fr; }
+.field { display: flex; flex-direction: column; gap: 3px; }
+.field label { font-size: 11px; color: var(--gray-500); font-weight: 500; }
+.field label .req { color: #dc2626; }
+.field input, .field select, .field textarea { padding: 6px 10px; border: 1px solid var(--gray-200); border-radius: 6px; font-family: var(--font); font-size: 12.5px; color: var(--black); background: var(--white); outline: none; transition: border-color 0.12s; }
+.field input:focus, .field select:focus, .field textarea:focus { border-color: var(--black); }
+.field textarea { resize: vertical; min-height: 56px; line-height: 1.5; }
+
+.tags-field { display: flex; flex-wrap: wrap; gap: 4px; padding: 5px 8px; border: 1px solid var(--gray-200); border-radius: 6px; min-height: 34px; align-items: center; cursor: text; transition: border-color 0.12s; }
+.tags-field:focus-within { border-color: var(--black); }
+.tag-chip { display: inline-flex; align-items: center; gap: 3px; padding: 2px 7px; background: var(--gray-100); border-radius: 4px; font-size: 11.5px; color: var(--gray-700); }
+.tag-chip button { background: none; border: none; cursor: pointer; color: var(--gray-400); font-size: 13px; line-height: 1; padding: 0; display: flex; align-items: center; }
+.tag-chip button:hover { color: #dc2626; }
+.tags-field input { border: none; outline: none; font-family: var(--font); font-size: 12px; color: var(--black); min-width: 80px; flex: 1; background: none; padding: 1px 0; }
+
+.toggle-row { display: flex; align-items: center; gap: 10px; }
+.toggle { width: 36px; height: 20px; background: var(--gray-200); border-radius: 10px; position: relative; cursor: pointer; transition: background 0.18s; flex-shrink: 0; }
+.toggle.on { background: var(--black); }
+.toggle::after { content: ''; position: absolute; width: 14px; height: 14px; background: var(--white); border-radius: 50%; top: 3px; left: 3px; transition: left 0.18s; box-shadow: 0 1px 3px rgba(0,0,0,0.2); }
+.toggle.on::after { left: 19px; }
+.toggle-label { font-size: 12.5px; color: var(--gray-600); }
+
+/* Status dropdown — like LiveSklad */
+.status-trigger-wrap { position: relative; display: inline-block; }
+.status-trigger {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 14px; border-radius: 6px; font-size: 12.5px; font-weight: 700;
+  cursor: pointer; border: none; color: var(--white); transition: opacity 0.12s;
+  user-select: none;
+}
+.status-trigger:hover { opacity: 0.88; }
+.status-trigger.light { color: var(--gray-800); }
+.status-trigger svg { opacity: 0.7; }
+
+.status-dropdown {
+  display: none; position: absolute; top: calc(100% + 4px); left: 0;
+  background: var(--white); border: 1px solid var(--gray-200); border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.14); z-index: 50; min-width: 220px;
+  padding: 8px; overflow-y: auto; max-height: 420px;
+}
+.status-dropdown.open { display: block; }
+
+.sd-group-label {
+  font-size: 10px; font-weight: 700; color: var(--gray-400);
+  text-transform: uppercase; letter-spacing: 1px;
+  padding: 6px 4px 3px; display: block;
+}
+.sd-option {
+  display: block; width: 100%; padding: 7px 12px; border-radius: 6px;
+  font-size: 12.5px; font-weight: 700; cursor: pointer; color: var(--white);
+  border: none; text-align: left; margin-bottom: 3px; transition: opacity 0.1s, transform 0.1s;
+}
+.sd-option:hover { opacity: 0.88; transform: translateX(2px); }
+.sd-option.light { color: var(--gray-800); }
+.sd-option.active { outline: 2.5px solid var(--black); outline-offset: 1px; }
+
+/* ─── HISTORY PANEL ─── */
+.panel-history { width: 196px; border-left: 1px solid var(--gray-100); overflow-y: auto; padding: 12px; flex-shrink: 0; display: flex; flex-direction: column; gap: 0; }
+.hist-header { font-size: 9.5px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; }
+.hist-date { font-size: 10px; color: var(--gray-400); font-family: var(--mono); text-align: center; margin-bottom: 10px; padding: 4px 6px; background: var(--gray-50); border-radius: 4px; }
+.hist-item { padding-left: 14px; position: relative; margin-bottom: 10px; animation: histIn 0.2s ease; }
+@keyframes histIn { from { opacity:0; transform:translateY(-4px); } to { opacity:1; transform:none; } }
+.hist-item::before { content: ''; position: absolute; left: 3px; top: 6px; width: 6px; height: 6px; border-radius: 50%; background: var(--gray-300); flex-shrink:0; }
+.hist-item::after { content: ''; position: absolute; left: 5.5px; top: 14px; bottom: -10px; width: 1px; background: var(--gray-200); }
+.hist-item:last-child::after { display: none; }
+.hist-item.current::before { background: var(--black); width: 8px; height: 8px; left: 2px; }
+.hist-time { font-size: 10px; color: var(--gray-400); font-family: var(--mono); margin-bottom: 2px; }
+.hist-badge { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10.5px; font-weight: 600; margin-bottom: 3px; color: var(--white); }
+.hist-text { font-size: 11px; color: var(--gray-600); line-height: 1.4; }
+.hist-meta { font-size: 10px; color: var(--gray-400); font-family: var(--mono); line-height: 1.5; margin-top: 2px; word-break: break-word; }
+
+.chat-section { margin-top: auto; border-top: 1px solid var(--gray-100); padding-top: 10px; }
+.chat-label { font-size: 9.5px; font-weight: 700; color: var(--gray-500); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; }
+.chat-input { display: flex; gap: 4px; }
+.chat-input input { flex: 1; border: 1px solid var(--gray-200); border-radius: 5px; padding: 5px 8px; font-family: var(--font); font-size: 11px; outline: none; }
+.chat-input input:focus { border-color: var(--black); }
+.chat-send { background: var(--black); color: var(--white); border: none; border-radius: 5px; padding: 5px 8px; cursor: pointer; font-size: 12px; }
+.chat-send:hover { background: var(--gray-800); }
+
+/* ─── WORKS TAB ─── */
+.works-toolbar { display: flex; align-items: center; gap: 8px; padding: 10px 0; border-bottom: 1px solid var(--gray-100); margin-bottom: 12px; }
+.works-toolbar .search-box { width: 180px; }
+
+.works-table { width: 100%; border-collapse: collapse; }
+.works-table th { padding: 7px 10px; text-align: left; font-size: 10.5px; font-weight: 600; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 1px solid var(--gray-200); background: var(--gray-50); }
+.works-table td { padding: 8px 10px; font-size: 12.5px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+.works-table tr:hover td { background: var(--gray-50); }
+
+.qty-control { display: flex; align-items: center; gap: 0; border: 1px solid var(--gray-200); border-radius: 5px; overflow: hidden; }
+.qty-btn { width: 24px; height: 24px; display: flex; align-items: center; justify-content: center; background: var(--gray-100); border: none; cursor: pointer; font-size: 14px; color: var(--gray-600); transition: background 0.1s; }
+.qty-btn:hover { background: var(--gray-200); }
+.qty-val { width: 32px; text-align: center; border: none; outline: none; font-family: var(--mono); font-size: 12px; font-weight: 600; background: var(--white); }
+
+.works-total { margin-top: 14px; padding-top: 12px; border-top: 2px solid var(--gray-200); }
+.total-row { display: flex; justify-content: space-between; align-items: center; padding: 4px 0; font-size: 12.5px; }
+.total-label { color: var(--gray-500); }
+.total-val { font-family: var(--mono); font-weight: 600; color: var(--black); }
+.total-row.grand { font-size: 14px; padding-top: 8px; border-top: 1px solid var(--gray-200); margin-top: 4px; }
+.total-row.grand .total-val { font-size: 16px; }
+
+/* Add item modal */
+.add-modal { display: none; position: fixed; inset: 0; z-index: 200; }
+.add-modal.open { display: flex; align-items: center; justify-content: center; }
+.add-modal-bg { position: absolute; inset: 0; background: rgba(0,0,0,0.35); backdrop-filter: blur(2px); }
+.add-modal-box { position: relative; z-index: 1; background: var(--white); border-radius: 12px; width: 540px; max-height: 80vh; display: flex; flex-direction: column; box-shadow: 0 20px 60px rgba(0,0,0,0.15); }
+.add-modal-head { padding: 16px 18px; border-bottom: 1px solid var(--gray-200); display: flex; align-items: center; gap: 10px; }
+.add-modal-title { font-size: 14px; font-weight: 700; }
+.add-modal-close { margin-left: auto; background: none; border: none; cursor: pointer; color: var(--gray-400); font-size: 18px; line-height: 1; padding: 2px 6px; border-radius: 4px; }
+.add-modal-close:hover { background: var(--gray-100); color: var(--black); }
+.add-modal-tabs { display: flex; border-bottom: 1px solid var(--gray-200); }
+.add-modal-tab { padding: 8px 16px; font-size: 12.5px; font-weight: 500; color: var(--gray-500); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.12s; }
+.add-modal-tab.active { color: var(--black); border-bottom-color: var(--black); }
+.add-modal-body { padding: 14px 18px; overflow-y: auto; flex: 1; }
+.add-search { display: flex; align-items: center; gap: 7px; padding: 7px 11px; border: 1px solid var(--gray-200); border-radius: 7px; margin-bottom: 12px; }
+.add-search input { flex: 1; border: none; outline: none; font-family: var(--font); font-size: 13px; }
+.add-list { display: flex; flex-direction: column; gap: 2px; }
+.add-item { display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 7px; cursor: pointer; transition: background 0.1s; }
+.add-item:hover { background: var(--gray-50); }
+.add-item-name { flex: 1; font-size: 12.5px; font-weight: 500; color: var(--black); }
+.add-item-code { font-size: 11px; color: var(--gray-400); font-family: var(--mono); }
+.add-item-price { font-size: 12.5px; font-family: var(--mono); font-weight: 600; color: var(--black); }
+.add-item-stock { font-size: 11px; color: var(--gray-400); margin-left: 4px; }
+.add-item-btn { padding: 4px 10px; background: var(--black); color: var(--white); border: none; border-radius: 5px; font-size: 11px; font-weight: 600; cursor: pointer; white-space: nowrap; }
+.add-item-btn:hover { background: var(--gray-800); }
+.add-item-btn.added { background: #16a34a; }
+
+/* Section groups in add modal */
+.add-group { margin-bottom: 14px; }
+.add-group-title { font-size: 10px; font-weight: 700; color: var(--gray-400); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 6px; padding: 0 10px; }
+
+/* ─── PANEL FOOTER ─── */
+.panel-footer { padding: 10px 16px; border-top: 1px solid var(--gray-200); display: flex; align-items: center; gap: 8px; flex-shrink: 0; background: var(--gray-50); }
+.print-dropdown { position: relative; }
+.print-menu { display: none; position: absolute; bottom: calc(100% + 6px); right: 0; background: var(--white); border: 1px solid var(--gray-200); border-radius: 8px; box-shadow: 0 8px 24px rgba(0,0,0,0.1); min-width: 200px; padding: 4px 0; z-index: 10; }
+.print-menu.open { display: block; }
+.print-menu-item { padding: 7px 14px; font-size: 12px; cursor: pointer; color: var(--gray-700); transition: background 0.1s; }
+.print-menu-item:hover { background: var(--gray-50); color: var(--black); }
+.print-menu-sep { height: 1px; background: var(--gray-200); margin: 4px 0; }
+
+/* ─── SCROLLBARS ─── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--gray-300); }
+
+/* ─── EMPTY ─── */
+.empty { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px 20px; color: var(--gray-300); gap: 8px; }
+.empty p { font-size: 13px; color: var(--gray-400); }
+
+/* ─── CHECKBOX ─── */
+input[type="checkbox"] { width: 14px; height: 14px; cursor: pointer; accent-color: var(--black); }
+
+/* urgent bell */
+.urgent-icon { color: #dc2626; font-size: 12px; }
+.overdue-icon { color: #f59e0b; font-size: 12px; }
+</style>
+</head>
+<body>
+
+<!-- ══ SIDEBAR ══ -->
+<aside class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">IBM</div>
+    <div>
+      <div class="logo-text">iBlackMaster</div>
+      <div class="logo-sub">ТК Панфиловский</div>
+    </div>
+  </div>
+  <nav class="nav">
+    <div class="nav-item" onclick="location.reload()">
+      <svg width="15" height="15" fill="none" viewBox="0 0 15 15"><rect x="1" y="1" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.2"/><rect x="8.5" y="1" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.2"/><rect x="1" y="8.5" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.2"/><rect x="8.5" y="8.5" width="5.5" height="5.5" rx="1.2" stroke="currentColor" stroke-width="1.2"/></svg>
+      Главная
+    </div>
+    <div class="nav-item active">
+      <svg width="15" height="15" fill="none" viewBox="0 0 15 15"><path d="M1 3.5h13M1 7.5h13M1 11.5h9" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Заказы
+    </div>
+    <div class="nav-item">
+      <svg width="15" height="15" fill="none" viewBox="0 0 15 15"><path d="M1 1h13M1 1l2 10h9l2-10" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/><circle cx="5" cy="13" r="1" fill="currentColor"/><circle cx="10" cy="13" r="1" fill="currentColor"/></svg>
+      Продажи
+    </div>
+    <div class="nav-item" id="nav-sklad" onclick="toggleNav('sklad')">
+      <svg width="15" height="15" fill="none" viewBox="0 0 15 15"><rect x="1" y="7" width="13" height="7" rx="1.2" stroke="currentColor" stroke-width="1.2"/><path d="M1 9l6.5-7 6.5 7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Склад
+      <svg style="margin-left:auto;width:9px;height:9px;transition:transform .2s" id="sklad-arr" fill="none" viewBox="0 0 9 9"><path d="M1.5 3l3 3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+    </div>
+    <div class="nav-sub" id="sklad-sub">
+      <div class="nav-subitem">Остатки</div>
+      <div class="nav-subitem">Поступления</div>
+      <div class="nav-subitem">Перемещения</div>
+      <div class="nav-subitem">Возвраты от клиентов</div>
+      <div class="nav-subitem">Возвраты поставщикам</div>
+      <div class="nav-subitem">Инвентаризации</div>
+      <div class="nav-subitem">Списания</div>
+    </div>
+    <div class="nav-item">
+      <svg width="15" height="15" fill="none" viewBox="0 0 15 15"><path d="M2 4l3 3 4-5M2 10l3 3 4-5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Задачи
+    </div>
+    <div class="nav-item">
+      <svg width="15" height="15" fill="none" viewBox="0 0 15 15"><path d="M1 4h13M3 7.5h9M5 11h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Прайсы
+    </div>
+    <div class="nav-item" id="nav-fin" onclick="toggleNav('fin')">
+      <svg width="15" height="15" fill="none" viewBox="0 0 15 15"><circle cx="7.5" cy="7.5" r="6.5" stroke="currentColor" stroke-width="1.2"/><path d="M7.5 4v1.5M7.5 9.5V11M5.5 6a2 2 0 014 0c0 1.5-4 1.5-4 3a2 2 0 004 0" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Финансы
+      <svg style="margin-left:auto;width:9px;height:9px;transition:transform .2s" id="fin-arr" fill="none" viewBox="0 0 9 9"><path d="M1.5 3l3 3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+    </div>
+    <div class="nav-sub" id="fin-sub">
+      <div class="nav-subitem">Кассы</div>
+      <div class="nav-subitem">Зарплата</div>
+      <div class="nav-subitem">Транзакции</div>
+      <div class="nav-subitem">Денежный поток</div>
+      <div class="nav-subitem">Счета</div>
+    </div>
+    <div class="nav-item">
+      <svg width="15" height="15" fill="none" viewBox="0 0 15 15"><path d="M1 13l4-5 3 2 4-6 2.5 2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Аналитика
+    </div>
+    <div class="nav-item" id="nav-hand" onclick="toggleNav('hand')">
+      <svg width="15" height="15" fill="none" viewBox="0 0 15 15"><path d="M2 4h11M2 7.5h7M2 11h5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Справочники
+      <svg style="margin-left:auto;width:9px;height:9px;transition:transform .2s" id="hand-arr" fill="none" viewBox="0 0 9 9"><path d="M1.5 3l3 3 3-3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+    </div>
+    <div class="nav-sub" id="hand-sub">
+      <div class="nav-subitem">Товары</div>
+      <div class="nav-subitem">Работы</div>
+      <div class="nav-subitem">Контрагенты</div>
+      <div class="nav-subitem">Устройства</div>
+      <div class="nav-subitem">Комплектации</div>
+      <div class="nav-subitem">Неисправности</div>
+      <div class="nav-subitem">Статьи денег</div>
+      <div class="nav-subitem">Ед. измерения</div>
+    </div>
+    <div class="nav-item">
+      <svg width="15" height="15" fill="none" viewBox="0 0 15 15"><path d="M7.5 1l1.5 4h4l-3.3 2.4 1.3 4-3.5-2.5-3.5 2.5 1.3-4L2 5h4z" stroke="currentColor" stroke-width="1.2"/></svg>
+      Уведомления
+    </div>
+    <div class="nav-item">
+      <svg width="15" height="15" fill="none" viewBox="0 0 15 15"><circle cx="7.5" cy="7.5" r="2.2" stroke="currentColor" stroke-width="1.2"/><path d="M7.5 1v1.5M7.5 12.5V14M1 7.5h1.5M12.5 7.5H14M2.9 2.9l1 1M11.1 11.1l1 1M2.9 12.1l1-1M11.1 3.9l1-1" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Настройки
+    </div>
+  </nav>
+  <div class="sidebar-user">
+    <div class="avatar">AS</div>
+    <div>
+      <div class="avatar-name">Sar. Anri</div>
+      <div class="avatar-role">БОСС</div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <span class="topbar-title">Заказы</span>
+    <span class="topbar-pipe">|</span>
+    <span class="topbar-loc">iBlackMaster (ТК Панфиловский)</span>
+    <div class="spacer"></div>
+    <button class="btn btn-ghost btn-sm">⬇ Экспорт</button>
+  </div>
+
+  <!-- TOOLBAR -->
+  <div class="toolbar">
+    <button class="btn btn-primary btn-sm" onclick="openPanel(null)">
+      <svg width="11" height="11" fill="none" viewBox="0 0 11 11"><path d="M5.5 1v9M1 5.5h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      Создать
+    </button>
+    <div class="search-box">
+      <svg width="13" height="13" fill="none" viewBox="0 0 13 13"><circle cx="5.5" cy="5.5" r="4.5" stroke="#aaa" stroke-width="1.3"/><path d="M9 9l3 3" stroke="#aaa" stroke-width="1.3" stroke-linecap="round"/></svg>
+      <input placeholder="Поиск по номеру, клиенту, устройству..." id="searchInput" oninput="filterOrders()">
+    </div>
+    <div class="filter-tabs">
+      <div class="filter-tab active" onclick="setTab(this,'all')">Все заказы</div>
+      <div class="filter-tab" onclick="setTab(this,'ready')">Готовые <span style="font-family:var(--mono);font-size:11px">82</span></div>
+    </div>
+    <button class="btn btn-ghost btn-sm" onclick="toggleFilters()">
+      <svg width="12" height="12" fill="none" viewBox="0 0 12 12"><path d="M1 3h10M3 6h6M5 9h2" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Фильтры
+    </button>
+
+    <div id="extraFilters" style="display:none;display:flex;gap:8px;align-items:center" class="hidden">
+      <select class="filter-sel" onchange="filterOrders()">
+        <option value="">Все статусы</option>
+        <option>Принят</option>
+        <option>В работе</option>
+        <option>В пайке</option>
+        <option>В переклейной</option>
+        <option>Ждёт запчасть</option>
+        <option>Клиент оповещён</option>
+        <option>Согласовать</option>
+        <option>Готов и клиент уведомлён</option>
+        <option>Готов (позвонить клиенту)</option>
+        <option>Закрыт (Выдан)</option>
+        <option>Отказ</option>
+      </select>
+      <select class="filter-sel" onchange="filterOrders()">
+        <option value="">Все менеджеры</option>
+        <option>Алексей Яковлев</option>
+        <option>Максим Невшупа</option>
+        <option>Евгений Черкасов</option>
+      </select>
+      <select class="filter-sel">
+        <option>Все локации</option>
+        <option>ТК Панфиловский</option>
+        <option>ТК Лента</option>
+        <option>ТК 1000 мелочей</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <div class="table-wrap">
+    <table id="ordersTable">
+      <thead>
+        <tr>
+          <th style="width:32px"><input type="checkbox" id="selectAll" onchange="toggleAll(this)"></th>
+          <th onclick="sortTable('num')" class="sort-asc">Заказ</th>
+          <th onclick="sortTable('status')">Статус</th>
+          <th onclick="sortTable('deadline')">Крайний срок</th>
+          <th onclick="sortTable('manager')">Менеджер</th>
+          <th onclick="sortTable('type')">Тип заказа</th>
+          <th onclick="sortTable('device')">Устройство</th>
+          <th onclick="sortTable('price')">Сумма</th>
+          <th style="width:32px"></th>
+        </tr>
+      </thead>
+      <tbody id="ordersBody"></tbody>
+    </table>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="table-footer">
+    <span>Всего заказов: <b style="color:var(--black);font-family:var(--mono)">12 185</b></span>
+    <div class="status-legend">
+      <div class="legend-item"><div class="legend-dot" style="background:#223DD6"></div>Новые 18</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#5CB85C"></div>В работе 20</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#F0AD4E"></div>Отложенные 83</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#272729"></div>Готовые 95</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#8E8E8E"></div>Выданные 12 0+</div>
+    </div>
+    <div class="pagination">
+      <div class="page-btn active">1</div>
+      <div class="page-btn">2</div>
+      <div class="page-btn">3</div>
+      <div class="page-btn">…</div>
+      <div class="page-btn">122</div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ OVERLAY ══ -->
+<div class="overlay" id="overlay" onclick="closePanel()"></div>
+
+<!-- ══ ORDER PANEL ══ -->
+<div class="panel" id="panel">
+  <div class="panel-head">
+    <div class="panel-close" onclick="closePanel()">
+      <svg width="13" height="13" fill="none" viewBox="0 0 13 13"><path d="M1 1l11 11M12 1L1 12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+    <div class="panel-title" id="panelTitle">Заказ №A14810</div>
+    <button class="btn btn-ghost btn-sm" style="margin-left:6px;font-size:11px">
+      ⇄ Передать в локацию
+    </button>
+    <div id="panelStatusBadge" style="margin-left:auto"></div>
+  </div>
+
+  <div class="panel-tabs">
+    <div class="panel-tab active" onclick="switchTab(this,'info')">
+      <svg width="12" height="12" fill="none" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M6 5.5v3M6 4v.4" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+      Информация о заказе
+    </div>
+    <div class="panel-tab" onclick="switchTab(this,'works')">
+      <svg width="12" height="12" fill="none" viewBox="0 0 12 12"><path d="M2 3h8M2 6h5M2 9h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M9 7l1.5 1.5L12 7" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      Работы и материалы
+      <span id="worksCount" style="background:var(--black);color:var(--white);border-radius:10px;padding:1px 6px;font-size:10px;font-family:var(--mono);font-weight:600">3</span>
+    </div>
+  </div>
+
+  <div class="panel-body">
+    <!-- ── INFO TAB ── -->
+    <div class="panel-form" id="tab-info">
+      <div class="fsection">
+        <div class="fsection-title">
+          <svg width="12" height="12" fill="none" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/></svg>
+          Статус заказа
+        </div>
+
+        <!-- Status button + dropdown (like LiveSklad) -->
+        <div class="status-trigger-wrap" id="statusWrap">
+          <button class="status-trigger" id="statusTrigger" onclick="toggleStatusDropdown(event)" style="background:#223DD6">
+            Принят
+            <svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M2 3.5l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+          </button>
+          <div class="status-dropdown" id="statusDropdown">
+            <span class="sd-group-label">Новые</span>
+            <button class="sd-option active" style="background:#223DD6" data-status="Принят" onclick="selectStatus(this)">Принят</button>
+
+            <span class="sd-group-label">В работе</span>
+            <button class="sd-option" style="background:#5CB85C" data-status="В работе" onclick="selectStatus(this)">В работе</button>
+            <button class="sd-option" style="background:#9AD03B" data-status="В пайке" onclick="selectStatus(this)">В пайке</button>
+            <button class="sd-option" style="background:#169672" data-status="В переклейной" onclick="selectStatus(this)">В переклейной</button>
+
+            <span class="sd-group-label">Отложенные</span>
+            <button class="sd-option" style="background:#F0AD4E" data-status="Ждёт запчасть" onclick="selectStatus(this)">Ждёт запчасть</button>
+            <button class="sd-option" style="background:#F0AD4E" data-status="Клиент оповещён" onclick="selectStatus(this)">Клиент оповещён</button>
+            <button class="sd-option" style="background:#CE0ECC" data-status="Согласовать" onclick="selectStatus(this)">Согласовать</button>
+            <button class="sd-option" style="background:#FB851A" data-status="Оповестить (запчасть в наличии)" onclick="selectStatus(this)">Оповестить (запчасть в наличии)</button>
+            <button class="sd-option" style="background:#FF8311" data-status="Передать в пайку" onclick="selectStatus(this)">Передать в пайку</button>
+
+            <span class="sd-group-label">Готовые</span>
+            <button class="sd-option" style="background:#272729" data-status="Готов и клиент уведомлён" onclick="selectStatus(this)">Готов и клиент уведомлён</button>
+            <button class="sd-option" style="background:#0C0CFD" data-status="Готов (позвонить клиенту)" onclick="selectStatus(this)">Готов (позвонить клиенту)</button>
+
+            <span class="sd-group-label">Выданные</span>
+            <button class="sd-option" style="background:#8E8E8E" data-status="Закрыт (Выдан)" onclick="selectStatus(this)">Закрыт (Выдан)</button>
+            <button class="sd-option light" style="background:#D6D6D6" data-status="Отказ" onclick="selectStatus(this)">Отказ</button>
+            <button class="sd-option light" style="background:#D6D6D6" data-status="Без ремонта" onclick="selectStatus(this)">Без ремонта</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="fsection">
+        <div class="fsection-title">
+          <svg width="12" height="12" fill="none" viewBox="0 0 12 12"><circle cx="6" cy="4" r="2.5" stroke="currentColor" stroke-width="1.2"/><path d="M1 11c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Клиент
+        </div>
+        <div class="frow cols-2">
+          <div class="field">
+            <label>Имя <span class="req">*</span></label>
+            <input value="Куц Илья" id="clientName">
+          </div>
+          <div class="field">
+            <label>Телефон</label>
+            <div style="display:flex;gap:4px">
+              <input value="+7 (916) 654-90-96" id="clientPhone" style="flex:1">
+              <button class="btn btn-ghost btn-sm" title="Позвонить" style="padding:6px 8px">📞</button>
+              <button class="btn btn-ghost btn-sm" title="WhatsApp" style="padding:6px 8px">💬</button>
+            </div>
+          </div>
+        </div>
+        <div class="frow cols-2">
+          <div class="field">
+            <label>Рекламный источник</label>
+            <select>
+              <option selected>Повторное обращение</option>
+              <option>Проходящий трафик</option>
+              <option>Instagram</option>
+              <option>ВКонтакте</option>
+              <option>Авито</option>
+              <option>Яндекс</option>
+              <option>Рекомендация</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Тип заказа</label>
+            <select>
+              <option selected>Негарантийный</option>
+              <option>Гарантийный</option>
+              <option>Страховой</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="fsection">
+        <div class="fsection-title">
+          <svg width="12" height="12" fill="none" viewBox="0 0 12 12"><rect x="1.5" y="1.5" width="9" height="9" rx="1.5" stroke="currentColor" stroke-width="1.2"/><path d="M4 6h4M4 8h2" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Устройство и неисправности
+        </div>
+        <div class="frow cols-2">
+          <div class="field">
+            <label>Марка</label>
+            <select id="brand" onchange="updateModels()">
+              <option>Poco</option><option>Apple</option><option>Samsung</option>
+              <option>Xiaomi</option><option>Huawei</option><option>OnePlus</option>
+              <option>Realme</option><option>Infinix</option><option>BlackView</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Модель</label>
+            <select id="model">
+              <option>M5s</option><option>M7</option><option>X5 Pro</option><option>X6</option>
+            </select>
+          </div>
+        </div>
+        <div class="frow cols-2">
+          <div class="field">
+            <label>Внешний вид</label>
+            <div class="tags-field" id="viewTags" onclick="focusTagInput('viewTags')">
+              <div class="tag-chip">царапины <button onclick="removeTag(this)">×</button></div>
+              <div class="tag-chip">потёртости <button onclick="removeTag(this)">×</button></div>
+              <input placeholder="+ добавить" onkeydown="addTagOnEnter(event,'viewTags')">
+            </div>
+          </div>
+          <div class="field">
+            <label>Серийный номер / IMEI</label>
+            <input placeholder="Введите IMEI...">
+          </div>
+        </div>
+        <div class="frow cols-2">
+          <div class="field">
+            <label>Неисправность</label>
+            <div class="tags-field" id="faultTags" onclick="focusTagInput('faultTags')">
+              <div class="tag-chip">Разбит дисплей <button onclick="removeTag(this)">×</button></div>
+              <input placeholder="+ добавить" onkeydown="addTagOnEnter(event,'faultTags')">
+            </div>
+          </div>
+          <div class="field">
+            <label>Пароль</label>
+            <input value="178">
+          </div>
+        </div>
+        <div class="frow cols-2">
+          <div class="field">
+            <label>Комментарий приёмщика</label>
+            <textarea>Замена дисплея оригинал</textarea>
+          </div>
+          <div class="field">
+            <label>Комплектация</label>
+            <select>
+              <option value="">— не выбрано —</option>
+              <option>Мышь</option>
+              <option>Без сим-лотка</option>
+              <option>Зарядное устройство</option>
+              <option>Сумка</option>
+              <option>Телефон у клиента</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div class="fsection">
+        <div class="fsection-title">
+          <svg width="12" height="12" fill="none" viewBox="0 0 12 12"><circle cx="6" cy="6" r="5" stroke="currentColor" stroke-width="1.2"/><path d="M6 4v2l1.5 1.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+          Дополнительная информация
+        </div>
+        <div class="frow cols-3">
+          <div class="field">
+            <label>Ориентировочная цена <span class="req">*</span></label>
+            <input value="7500" type="number">
+          </div>
+          <div class="field">
+            <label>Крайний срок</label>
+            <input type="datetime-local">
+          </div>
+          <div class="field" style="justify-content:flex-end">
+            <label>&nbsp;</label>
+            <div class="toggle-row">
+              <div class="toggle" onclick="this.classList.toggle('on')"></div>
+              <span class="toggle-label">🔥 Срочно</span>
+            </div>
+          </div>
+        </div>
+        <div class="frow cols-2">
+          <div class="field">
+            <label>Мастер</label>
+            <select>
+              <option>Алексей Яковлев</option>
+              <option>Евгений Черкасов</option>
+              <option>Максим Невшупа</option>
+              <option>Аксененко Денис</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Менеджер</label>
+            <select>
+              <option>Алексей Яковлев</option>
+              <option>Sar. Anri</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── WORKS TAB ── -->
+    <div class="panel-form hidden" id="tab-works">
+      <div class="works-toolbar">
+        <button class="btn btn-primary btn-sm" onclick="openAddModal('work')">
+          <svg width="11" height="11" fill="none" viewBox="0 0 11 11"><path d="M5.5 1v9M1 5.5h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Добавить работу
+        </button>
+        <button class="btn btn-secondary btn-sm" onclick="openAddModal('part')">
+          <svg width="11" height="11" fill="none" viewBox="0 0 11 11"><path d="M5.5 1v9M1 5.5h9" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+          Добавить запчасть
+        </button>
+        <button class="btn btn-ghost btn-sm" onclick="openAddModal('stock')">
+          <svg width="11" height="11" fill="none" viewBox="0 0 11 11"><rect x="1" y="4" width="9" height="6" rx="1" stroke="currentColor" stroke-width="1.2"/><path d="M1 6L5.5 2 10 6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Со склада
+        </button>
+        <div class="search-box" style="margin-left:auto;width:160px">
+          <svg width="12" height="12" fill="none" viewBox="0 0 12 12"><circle cx="5" cy="5" r="4" stroke="#aaa" stroke-width="1.2"/><path d="M8.5 8.5l2 2" stroke="#aaa" stroke-width="1.2" stroke-linecap="round"/></svg>
+          <input placeholder="Поиск...">
+        </div>
+      </div>
+
+      <table class="works-table" id="worksTable">
+        <thead>
+          <tr>
+            <th style="width:32px"><input type="checkbox"></th>
+            <th>Наименование</th>
+            <th style="width:90px">Кол-во</th>
+            <th style="width:90px">Цена, ₽</th>
+            <th style="width:90px">Итого, ₽</th>
+            <th style="width:32px"></th>
+          </tr>
+        </thead>
+        <tbody id="worksBody">
+          <!-- populated by JS -->
+        </tbody>
+      </table>
+
+      <div class="works-total">
+        <div class="total-row">
+          <span class="total-label">Работы</span>
+          <span class="total-val" id="totalWorks">1 500 ₽</span>
+        </div>
+        <div class="total-row">
+          <span class="total-label">Запчасти</span>
+          <span class="total-val" id="totalParts">9 500 ₽</span>
+        </div>
+        <div class="total-row grand">
+          <span style="font-size:13px;font-weight:700">ИТОГО</span>
+          <span class="total-val" id="totalAll">11 000 ₽</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- HISTORY -->
+    <div class="panel-history" id="tab-history">
+      <div class="hist-header">История</div>
+      <div class="hist-date" id="histDate">27.03.2026 · 20:36</div>
+      <div id="histItems"></div>
+      <div class="chat-section">
+        <div class="chat-label">Чат</div>
+        <div class="chat-input">
+          <input placeholder="Комментарий... (Shift+Enter)" id="chatInput" onkeydown="sendChat(event)">
+          <button class="chat-send" onclick="sendChatMsg()">→</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="panel-footer">
+    <button class="btn btn-primary btn-sm" id="issueBtn">✓ Выдать</button>
+    <button class="btn btn-secondary btn-sm" onclick="saveOrder()">Сохранить</button>
+    <button class="btn btn-ghost btn-sm">Закрыть</button>
+    <div style="margin-left:auto;display:flex;gap:6px">
+      <div class="print-dropdown">
+        <button class="btn btn-ghost btn-sm" onclick="togglePrintMenu()">🖨 Печать ▾</button>
+        <div class="print-menu" id="printMenu">
+          <div class="print-menu-item">Квитанция о приёме</div>
+          <div class="print-menu-item">Акт выполненных работ</div>
+          <div class="print-menu-item">Гарантийный талон</div>
+          <div class="print-menu-item">Отказной лист</div>
+          <div class="print-menu-sep"></div>
+          <div class="print-menu-item">Счёт-фактура</div>
+        </div>
+      </div>
+      <button class="btn btn-ghost btn-sm">⋯</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ADD ITEM MODAL ══ -->
+<div class="add-modal" id="addModal">
+  <div class="add-modal-bg" onclick="closeAddModal()"></div>
+  <div class="add-modal-box">
+    <div class="add-modal-head">
+      <div class="add-modal-title" id="addModalTitle">Добавить работу</div>
+      <button class="add-modal-close" onclick="closeAddModal()">×</button>
+    </div>
+    <div class="add-modal-tabs" id="addModalTabs">
+      <div class="add-modal-tab active" onclick="switchAddTab(this,'work')">Работы</div>
+      <div class="add-modal-tab" onclick="switchAddTab(this,'part')">Запчасти</div>
+      <div class="add-modal-tab" onclick="switchAddTab(this,'stock')">Со склада</div>
+    </div>
+    <div class="add-modal-body">
+      <div class="add-search">
+        <svg width="13" height="13" fill="none" viewBox="0 0 13 13"><circle cx="5.5" cy="5.5" r="4.5" stroke="#aaa" stroke-width="1.3"/><path d="M9 9l3 3" stroke="#aaa" stroke-width="1.3" stroke-linecap="round"/></svg>
+        <input placeholder="Поиск по названию, коду..." id="addSearchInput" oninput="filterAddList()">
+      </div>
+      <div class="add-list" id="addList"></div>
+    </div>
+    <div style="padding:10px 18px;border-top:1px solid var(--gray-200);display:flex;justify-content:flex-end;gap:8px">
+      <button class="btn btn-ghost btn-sm" onclick="closeAddModal()">Отмена</button>
+      <button class="btn btn-primary btn-sm" onclick="closeAddModal()">Готово</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ─── DATA ───────────────────────────────────────────────────────────
+const STATUS_COLORS = {
+  'Принят':           { bg: '#223DD6', light: false },
+  'В работе':         { bg: '#5CB85C', light: false },
+  'В пайке':          { bg: '#9AD03B', light: false },
+  'В переклейной':    { bg: '#169672', light: false },
+  'Ждёт запчасть':    { bg: '#F0AD4E', light: false },
+  'Клиент оповещён':  { bg: '#F0AD4E', light: false },
+  'Согласовать':      { bg: '#CE0ECC', light: false },
+  'Оповестить (запчасть в наличии)': { bg: '#FB851A', light: false },
+  'Передать в пайку': { bg: '#FF8311', light: false },
+  'Готов и клиент уведомлён': { bg: '#272729', light: false },
+  'Готов (позвонить клиенту)': { bg: '#0C0CFD', light: false },
+  'Закрыт (Выдан)':   { bg: '#8E8E8E', light: false },
+  'Отказ':            { bg: '#D6D6D6', light: true },
+  'Без ремонта':      { bg: '#D6D6D6', light: true },
+};
+
+function makeStatusBadge(status, small = false) {
+  const s = STATUS_COLORS[status] || { bg: '#888', light: false };
+  const sz = small ? 'font-size:10.5px;padding:2px 7px' : 'font-size:11.5px;padding:3px 9px';
+  const color = s.light ? '#3d3d3d' : '#ffffff';
+  return `<span class="status-badge" style="background:${s.bg};color:${color};border-radius:5px;font-weight:600;${sz}">${status}</span>`;
+}
+
+const ORDERS = [
+  { num:'A14810', status:'Принят',    date:'27.03 · 20:36', manager:'Алексей Яковлев', type:'Негарантийный', deviceType:'Смартфон',  device:'Poco M5s',                  price:7500,  urgent:false },
+  { num:'A14809', status:'Принят',    date:'27.03 · 17:14', manager:'Алексей Яковлев', type:'Негарантийный', deviceType:'Смартфон',  device:'Xiaomi Redmi Note Pro+',    price:4200,  urgent:true  },
+  { num:'A14808', status:'В работе',  date:'27.03 · 13:02', manager:'Алексей Яковлев', type:'Негарантийный', deviceType:'Смартфон',  device:'Infinix GT 20 Pro',         price:6800,  urgent:false },
+  { num:'A14807', status:'Закрыт (Выдан)', date:'27.03 · 12:16', manager:'Алексей Яковлев', type:'Негарантийный', deviceType:'Смартфон', device:'Apple iPhone 11', price:12000, urgent:false },
+  { num:'A14806', status:'Готов и клиент уведомлён', date:'27.03 · 11:15', manager:'Алексей Яковлев', type:'Негарантийный', deviceType:'Смартфон', device:'Samsung N985', price:8500, urgent:false },
+  { num:'A14805', status:'Принят',    date:'27.03 · 10:49', manager:'Алексей Яковлев', type:'Негарантийный', deviceType:'Планшет',   device:'BlackView Tab 11',          price:3000,  urgent:false },
+  { num:'A14804', status:'Закрыт (Выдан)', date:'27.03 · 10:34', manager:'Алексей Яковлев', type:'Негарантийный', deviceType:'Смартфон', device:'Poco X3', price:5500, urgent:false },
+  { num:'A14803', status:'В пайке',   date:'26.03 · 18:20', manager:'Максим Невшупа',  type:'Ноутбук/ПК',    deviceType:'Ноутбук',   device:'MSI ms-16r3',               price:15000, urgent:false },
+  { num:'A14802', status:'Ждёт запчасть', date:'25.03 · 14:10', manager:'Евгений Черкасов', type:'Гарантийный', deviceType:'Смартфон', device:'Samsung Galaxy S23', price:0, urgent:false },
+  { num:'A14801', status:'В работе',  date:'25.03 · 11:05', manager:'Алексей Яковлев', type:'Негарантийный', deviceType:'Смартфон',  device:'OnePlus 15',                price:11000, urgent:true  },
+  { num:'A14800', status:'Клиент оповещён', date:'24.03 · 16:30', manager:'Алексей Яковлев', type:'Негарантийный', deviceType:'Смартфон', device:'Apple iPhone 14 Pro', price:18000, urgent:false },
+  { num:'A14799', status:'В переклейной', date:'24.03 · 14:00', manager:'Максим Невшупа', type:'Негарантийный', deviceType:'Смартфон', device:'Samsung A54', price:9000, urgent:false },
+  { num:'A14798', status:'Согласовать', date:'23.03 · 10:00', manager:'Евгений Черкасов', type:'Гарантийный', deviceType:'Планшет', device:'iPad Air 5', price:0, urgent:false },
+  { num:'A14797', status:'Готов (позвонить клиенту)', date:'23.03 · 09:00', manager:'Алексей Яковлев', type:'Негарантийный', deviceType:'Смартфон', device:'Xiaomi 13 Pro', price:14000, urgent:false },
+  { num:'A14796', status:'Отказ',     date:'22.03 · 17:30', manager:'Алексей Яковлев', type:'Негарантийный', deviceType:'Смартфон',  device:'Realme C35',                price:0,     urgent:false },
+];
+
+// Works data
+let worksItems = [
+  { id:1, type:'work', name:'Замена дисплея оригинал', code:'3011', qty:1, price:1500 },
+  { id:2, type:'part', name:'Дисплей Poco M5s OLED', code:'5821', qty:1, price:4500, stock:2 },
+  { id:3, type:'part', name:'Клей B-7000 10мл', code:'1122', qty:2, price:150, stock:14 },
+];
+
+// Catalog data
+const WORKS_CATALOG = [
+  { name:'Замена дисплея оригинал', code:'3011', price:1500 },
+  { name:'Замена дисплея копия', code:'3012', price:900 },
+  { name:'Замена аккумулятора', code:'2001', price:600 },
+  { name:'Замена стекла', code:'2100', price:800 },
+  { name:'Чистка от влаги', code:'4001', price:700 },
+  { name:'Прошивка/разблокировка', code:'4100', price:500 },
+  { name:'Диагностика', code:'1000', price:0 },
+  { name:'Пайка разъёма зарядки', code:'5001', price:1200 },
+  { name:'Замена камеры основной', code:'3200', price:2000 },
+  { name:'Восстановление Face ID', code:'3500', price:3500 },
+];
+
+const PARTS_CATALOG = [
+  { name:'Дисплей Poco M5s OLED', code:'5821', price:4500, stock:2 },
+  { name:'Дисплей iPhone 14 Pro оригинал', code:'5231', price:18500, stock:1 },
+  { name:'Аккумулятор Samsung Galaxy A54', code:'6100', price:1200, stock:5 },
+  { name:'Стекло защитное iPhone 14', code:'7001', price:350, stock:12 },
+  { name:'Разъём зарядки Type-C', code:'8001', price:280, stock:8 },
+  { name:'Камера основная Xiaomi 13', code:'9001', price:6500, stock:0 },
+];
+
+const STOCK_CATALOG = [
+  { name:'Чехол Silicon Case для iPhone 14', code:'1479', price:1.5, stock:27 },
+  { name:'Чехол Silicon Case для iPhone 14 Pro', code:'4853', price:1.5, stock:26 },
+  { name:'3D Стекло Samsung Galaxy A54', code:'6100', price:80, stock:18 },
+  { name:'Клей B-7000 10мл', code:'1122', price:150, stock:14 },
+  { name:'Термопаста КПТ-8 5г', code:'3300', price:90, stock:6 },
+  { name:'Лента двусторонняя 5мм', code:'4400', price:60, stock:20 },
+  { name:'Пленка защитная универсальная', code:'5500', price:40, stock:35 },
+];
+
+// ─── ORDERS TABLE ─────────────────────────────────────────────────
+let currentOrders = [...ORDERS];
+let currentPanel = null;
+
+function renderOrders(orders) {
+  const body = document.getElementById('ordersBody');
+  body.innerHTML = orders.map((o,i) => `
+    <tr onclick="openPanel(${i})" data-idx="${i}">
+      <td onclick="event.stopPropagation()"><input type="checkbox" class="row-cb"></td>
+      <td>
+        <div class="order-num">${o.num}</div>
+        ${o.urgent ? '<span style="font-size:10px;color:#dc2626;font-weight:600">🔥 СРОЧНО</span>' : ''}
+      </td>
+      <td>${makeStatusBadge(o.status, true)}</td>
+      <td><span class="order-date">${o.date}</span></td>
+      <td style="font-size:12px;color:var(--gray-600)">${o.manager}</td>
+      <td style="font-size:12px;color:var(--gray-500)">${o.type}</td>
+      <td>
+        <div class="device-cell">${o.device}</div>
+        <div class="device-type">${o.deviceType}</div>
+      </td>
+      <td style="font-family:var(--mono);font-size:12px;font-weight:600;color:${o.price ? 'var(--black)' : 'var(--gray-300)'}">
+        ${o.price ? o.price.toLocaleString('ru')+' ₽' : '—'}
+      </td>
+      <td onclick="event.stopPropagation()">
+        <button style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:16px;padding:2px" title="Действия">⋯</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+renderOrders(currentOrders);
+
+function filterOrders() {
+  const q = document.getElementById('searchInput').value.toLowerCase();
+  currentOrders = ORDERS.filter(o =>
+    o.num.toLowerCase().includes(q) ||
+    o.device.toLowerCase().includes(q) ||
+    o.manager.toLowerCase().includes(q)
+  );
+  renderOrders(currentOrders);
+}
+
+function setTab(el, tab) {
+  document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+}
+
+function toggleAll(cb) {
+  document.querySelectorAll('.row-cb').forEach(c => c.checked = cb.checked);
+}
+
+let sortDir = {};
+function sortTable(col) {
+  sortDir[col] = !sortDir[col];
+  currentOrders.sort((a,b) => {
+    let va = a[col] || '', vb = b[col] || '';
+    if (typeof va === 'number') return sortDir[col] ? va-vb : vb-va;
+    return sortDir[col] ? va.localeCompare(vb) : vb.localeCompare(va);
+  });
+  renderOrders(currentOrders);
+}
+
+let filtersVisible = false;
+function toggleFilters() {
+  filtersVisible = !filtersVisible;
+  const el = document.getElementById('extraFilters');
+  el.style.display = filtersVisible ? 'flex' : 'none';
+}
+
+// ─── PANEL ────────────────────────────────────────────────────────
+function openPanel(idx) {
+  currentPanel = idx !== null ? currentOrders[idx] : {
+    num:'Новый', status:'Принят', date:'', manager:'', type:'Негарантийный', device:'', deviceType:'', price:0
+  };
+
+  document.getElementById('panelTitle').textContent =
+    idx !== null ? `Заказ №${currentPanel.num}` : 'Новый заказ';
+  document.getElementById('panelStatusBadge').innerHTML = makeStatusBadge(currentPanel.status);
+  document.getElementById('panel').classList.add('open');
+  document.getElementById('overlay').classList.add('open');
+
+  // Update trigger button
+  const s = STATUS_COLORS[currentPanel.status] || {bg:'#888', light:false};
+  const trigger = document.getElementById('statusTrigger');
+  trigger.style.background = s.bg;
+  trigger.className = 'status-trigger' + (s.light ? ' light' : '');
+  trigger.innerHTML = currentPanel.status + ' <svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M2 3.5l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+
+  // Mark active in dropdown
+  document.querySelectorAll('.sd-option').forEach(o => {
+    o.classList.toggle('active', o.dataset.status === currentPanel.status);
+  });
+
+  // History
+  renderHistory(currentPanel);
+  renderWorks();
+  // Init field tracking (after DOM settled)
+  setTimeout(initFieldTracking, 50);
+}
+
+function closePanel() {
+  document.getElementById('panel').classList.remove('open');
+  document.getElementById('overlay').classList.remove('open');
+}
+
+// ─── HISTORY ENGINE ──────────────────────────────────────────────
+// Each entry: { time, type, payload }
+// types: 'status', 'field', 'work_add', 'work_remove', 'work_qty', 'work_price', 'comment', 'tag_add', 'tag_remove'
+
+let historyLog = [];
+
+function nowTime() {
+  return new Date().toLocaleTimeString('ru', { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+}
+
+function nowFull() {
+  const d = new Date();
+  return d.toLocaleDateString('ru', {day:'2-digit',month:'2-digit',year:'numeric'})
+    + ' · ' + d.toLocaleTimeString('ru',{hour:'2-digit',minute:'2-digit'});
+}
+
+function pushHistory(type, payload) {
+  historyLog.unshift({ time: nowTime(), type, payload });
+  renderHistoryLog();
+}
+
+function renderHistory(order) {
+  // Seed with existing order data as initial state
+  const s = STATUS_COLORS[order.status] || {bg:'#888',light:false};
+  historyLog = [
+    { time: (order.date||'').split(' · ')[1] || '20:36', type:'status',
+      payload:{ status: order.status, bg: s.bg, light: s.light } },
+    { time: (order.date||'').split(' · ')[1] || '20:36', type:'comment',
+      payload:{ text: 'Замена дисплея оригинал', author: order.manager||'Алексей Яковлев' } },
+    { time: '20:30', type:'field',
+      payload:{ label:'Изменены данные', meta:`Пароль: 178\nИзменил: ${order.manager||'Алексей Яковлев'}` } },
+  ];
+  document.getElementById('histDate').textContent = order.date || nowFull();
+  renderHistoryLog();
+}
+
+function renderHistoryLog() {
+  const container = document.getElementById('histItems');
+  container.innerHTML = historyLog.map((entry, i) => {
+    const isCurrent = i === 0;
+    let inner = '';
+
+    if (entry.type === 'status') {
+      const s = entry.payload;
+      inner = `<div class="hist-badge" style="background:${s.bg};color:${s.light?'#444':'#fff'}">${s.status}</div>`;
+    } else if (entry.type === 'field') {
+      const p = entry.payload;
+      inner = `<div class="hist-text" style="color:var(--gray-500)">${p.label}</div>`;
+      if (p.meta) inner += `<div class="hist-meta">${p.meta.replace(/\n/g,'<br>')}</div>`;
+    } else if (entry.type === 'comment') {
+      inner = `
+        <div class="hist-text" style="font-weight:500;color:var(--black)">${entry.payload.author}</div>
+        <div class="hist-text" style="color:var(--gray-500)">${entry.payload.text}</div>`;
+    } else if (entry.type === 'work_add') {
+      const ic = entry.payload.wtype === 'work' ? '🔧' : '⚙';
+      inner = `<div class="hist-text" style="color:var(--gray-500)">${ic} Добавлено</div>
+               <div class="hist-meta">${entry.payload.name}<br>${entry.payload.qty} × ${entry.payload.price.toLocaleString('ru')} ₽</div>`;
+    } else if (entry.type === 'work_remove') {
+      inner = `<div class="hist-text" style="color:#dc2626">✕ Удалено</div>
+               <div class="hist-meta">${entry.payload.name}</div>`;
+    } else if (entry.type === 'work_qty') {
+      inner = `<div class="hist-text" style="color:var(--gray-500)">Кол-во изменено</div>
+               <div class="hist-meta">${entry.payload.name}<br>${entry.payload.old} → ${entry.payload.newVal} шт.</div>`;
+    } else if (entry.type === 'work_price') {
+      inner = `<div class="hist-text" style="color:var(--gray-500)">Цена изменена</div>
+               <div class="hist-meta">${entry.payload.name}<br>${entry.payload.old.toLocaleString('ru')} → ${entry.payload.newVal.toLocaleString('ru')} ₽</div>`;
+    } else if (entry.type === 'tag_add') {
+      inner = `<div class="hist-text" style="color:var(--gray-500)">${entry.payload.field}: добавлен тег</div>
+               <div class="hist-meta">"${entry.payload.value}"</div>`;
+    } else if (entry.type === 'tag_remove') {
+      inner = `<div class="hist-text" style="color:var(--gray-500)">${entry.payload.field}: удалён тег</div>
+               <div class="hist-meta">"${entry.payload.value}"</div>`;
+    } else if (entry.type === 'save') {
+      inner = `<div class="hist-text" style="color:#16a34a;font-weight:600">✓ Сохранено</div>`;
+    }
+
+    return `<div class="hist-item ${isCurrent ? 'current' : ''}">
+      <div class="hist-time">${entry.time}</div>
+      ${inner}
+    </div>`;
+  }).join('');
+  // scroll to top (newest first)
+  container.scrollTop = 0;
+}
+
+function toggleStatusDropdown(e) {
+  e.stopPropagation();
+  document.getElementById('statusDropdown').classList.toggle('open');
+}
+
+function selectStatus(el) {
+  const status = el.dataset.status;
+  const s = STATUS_COLORS[status] || { bg:'#888', light:false };
+
+  // Update all options — remove active
+  document.querySelectorAll('.sd-option').forEach(o => o.classList.remove('active'));
+  el.classList.add('active');
+
+  // Update trigger button
+  const trigger = document.getElementById('statusTrigger');
+  trigger.style.background = s.bg;
+  trigger.className = 'status-trigger' + (s.light ? ' light' : '');
+  trigger.innerHTML = status + ' <svg width="10" height="10" fill="none" viewBox="0 0 10 10"><path d="M2 3.5l3 3 3-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+  trigger.onclick = toggleStatusDropdown;
+
+  // Close dropdown
+  document.getElementById('statusDropdown').classList.remove('open');
+
+  // Update badge in panel header
+  document.getElementById('panelStatusBadge').innerHTML = makeStatusBadge(status);
+
+  // Update history
+  if(currentPanel) {
+    currentPanel.status = status;
+    pushHistory('status', { status, bg: s.bg, light: s.light });
+  }
+}
+
+// Close dropdown on outside click
+document.addEventListener('click', e => {
+  if(!e.target.closest('#statusWrap')) {
+    document.getElementById('statusDropdown')?.classList.remove('open');
+  }
+  if(!e.target.closest('.print-dropdown')) {
+    document.getElementById('printMenu').classList.remove('open');
+  }
+});
+
+// Tab switching
+function switchTab(el, tab) {
+  document.querySelectorAll('.panel-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('tab-info').classList.toggle('hidden', tab !== 'info');
+  document.getElementById('tab-works').classList.toggle('hidden', tab !== 'works');
+}
+
+// ─── WORKS ────────────────────────────────────────────────────────
+function renderWorks() {
+  const body = document.getElementById('worksBody');
+  body.innerHTML = worksItems.map(w => `
+    <tr>
+      <td><input type="checkbox"></td>
+      <td>
+        <div style="font-size:12.5px;font-weight:500;color:var(--black)">${w.name}</div>
+        <div style="font-size:10.5px;color:var(--gray-400);font-family:var(--mono)">
+          ${w.type === 'work' ? '🔧 Работа' : '⚙ Запчасть'} · Код: ${w.code}
+          ${w.stock !== undefined ? `· На складе: ${w.stock} шт.` : ''}
+        </div>
+      </td>
+      <td>
+        <div class="qty-control">
+          <button class="qty-btn" onclick="changeQty(${w.id},-1)">−</button>
+          <input class="qty-val" value="${w.qty}" type="number" min="0.1" step="0.5"
+            onchange="setQty(${w.id},this.value)" onclick="event.stopPropagation()">
+          <button class="qty-btn" onclick="changeQty(${w.id},1)">+</button>
+        </div>
+      </td>
+      <td>
+        <input style="width:80px;border:1px solid var(--gray-200);border-radius:5px;padding:4px 7px;font-family:var(--mono);font-size:12px;outline:none;text-align:right"
+          value="${w.price}" type="number" onchange="setPrice(${w.id},this.value)">
+      </td>
+      <td style="font-family:var(--mono);font-size:12.5px;font-weight:600;text-align:right">
+        ${(w.qty * w.price).toLocaleString('ru')} ₽
+      </td>
+      <td>
+        <button onclick="removeWork(${w.id})" style="background:none;border:none;cursor:pointer;color:var(--gray-400);font-size:14px" title="Удалить">×</button>
+      </td>
+    </tr>
+  `).join('');
+
+  updateTotals();
+  document.getElementById('worksCount').textContent = worksItems.length;
+}
+
+function updateTotals() {
+  const works = worksItems.filter(w=>w.type==='work').reduce((s,w)=>s+w.qty*w.price,0);
+  const parts = worksItems.filter(w=>w.type==='part').reduce((s,w)=>s+w.qty*w.price,0);
+  document.getElementById('totalWorks').textContent = works.toLocaleString('ru')+' ₽';
+  document.getElementById('totalParts').textContent = parts.toLocaleString('ru')+' ₽';
+  document.getElementById('totalAll').textContent = (works+parts).toLocaleString('ru')+' ₽';
+}
+
+function changeQty(id, delta) {
+  const w = worksItems.find(w=>w.id===id);
+  if(w) {
+    const old = w.qty;
+    w.qty = Math.max(0.5, +(w.qty+delta).toFixed(1));
+    if(w.qty !== old) pushHistory('work_qty', { name: w.name, old, newVal: w.qty });
+    renderWorks();
+  }
+}
+
+function setQty(id, val) {
+  const w = worksItems.find(w=>w.id===id);
+  if(w) {
+    const old = w.qty;
+    w.qty = Math.max(0.5, parseFloat(val)||1);
+    if(w.qty !== old) pushHistory('work_qty', { name: w.name, old, newVal: w.qty });
+    renderWorks();
+  }
+}
+
+function setPrice(id, val) {
+  const w = worksItems.find(w=>w.id===id);
+  if(w) {
+    const old = w.price;
+    w.price = parseFloat(val)||0;
+    if(w.price !== old) pushHistory('work_price', { name: w.name, old, newVal: w.price });
+    updateTotals();
+  }
+}
+
+function removeWork(id) {
+  const w = worksItems.find(w=>w.id===id);
+  if(w) pushHistory('work_remove', { name: w.name });
+  worksItems = worksItems.filter(w=>w.id!==id);
+  renderWorks();
+}
+
+// ─── ADD MODAL ────────────────────────────────────────────────────
+let addModalMode = 'work';
+let nextId = 10;
+
+function openAddModal(mode) {
+  addModalMode = mode;
+  document.getElementById('addModal').classList.add('open');
+  document.getElementById('addSearchInput').value = '';
+
+  const titles = { work:'Добавить работу', part:'Добавить запчасть', stock:'Выбрать со склада' };
+  document.getElementById('addModalTitle').textContent = titles[mode];
+
+  // Select tab
+  document.querySelectorAll('.add-modal-tab').forEach((t,i) => {
+    const modes = ['work','part','stock'];
+    t.classList.toggle('active', modes[i] === mode);
+  });
+
+  renderAddList(mode);
+  setTimeout(() => document.getElementById('addSearchInput').focus(), 50);
+}
+
+function switchAddTab(el, mode) {
+  document.querySelectorAll('.add-modal-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  addModalMode = mode;
+  document.getElementById('addSearchInput').value = '';
+  renderAddList(mode);
+}
+
+function renderAddList(mode, q = '') {
+  const catalogs = { work: WORKS_CATALOG, part: PARTS_CATALOG, stock: STOCK_CATALOG };
+  const cat = catalogs[mode] || WORKS_CATALOG;
+  const filtered = cat.filter(item =>
+    item.name.toLowerCase().includes(q.toLowerCase()) ||
+    item.code.includes(q)
+  );
+
+  document.getElementById('addList').innerHTML = filtered.map(item => `
+    <div class="add-item">
+      <div>
+        <div class="add-item-name">${item.name}</div>
+        <div style="display:flex;gap:8px;margin-top:2px">
+          <span class="add-item-code">Код: ${item.code}</span>
+          ${item.stock !== undefined ? `<span class="add-item-stock">На складе: <b>${item.stock}</b> шт.</span>` : ''}
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="add-item-price">${item.price ? item.price.toLocaleString('ru')+' ₽' : 'Бесплатно'}</div>
+      </div>
+      <button class="add-item-btn" onclick="addItemToOrder('${mode}','${item.name}','${item.code}',${item.price},${item.stock||0},this)">
+        + Добавить
+      </button>
+    </div>
+  `).join('') || '<div class="empty"><p>Ничего не найдено</p></div>';
+}
+
+function filterAddList() {
+  const q = document.getElementById('addSearchInput').value;
+  renderAddList(addModalMode, q);
+}
+
+function addItemToOrder(type, name, code, price, stock, btn) {
+  const existing = worksItems.find(w => w.code === code);
+  if(existing) {
+    const old = existing.qty;
+    existing.qty++;
+    pushHistory('work_qty', { name: existing.name, old, newVal: existing.qty });
+  } else {
+    const wtype = type === 'stock' ? 'part' : type;
+    worksItems.push({ id: nextId++, type: wtype, name, code, qty:1, price, stock: stock||undefined });
+    pushHistory('work_add', { name, wtype, qty:1, price });
+  }
+  btn.textContent = '✓ Добавлено';
+  btn.classList.add('added');
+  setTimeout(() => { btn.textContent = '+ Добавить'; btn.classList.remove('added'); }, 1500);
+  renderWorks();
+  document.getElementById('worksCount').textContent = worksItems.length;
+}
+
+function closeAddModal() {
+  document.getElementById('addModal').classList.remove('open');
+}
+
+// ─── TAGS ────────────────────────────────────────────────────────
+function addTagOnEnter(e, containerId) {
+  if(e.key === 'Enter') {
+    e.preventDefault();
+    const input = e.target;
+    const val = input.value.trim();
+    if(!val) return;
+    const chip = document.createElement('div');
+    chip.className = 'tag-chip';
+    chip.innerHTML = `${val} <button onclick="removeTag(this,'${containerId}','${val}')">×</button>`;
+    input.parentElement.insertBefore(chip, input);
+    input.value = '';
+    const fieldName = containerId === 'viewTags' ? 'Внешний вид' : 'Неисправность';
+    pushHistory('tag_add', { field: fieldName, value: val });
+  }
+}
+
+function removeTag(btn, containerId, val) {
+  const fieldName = containerId === 'viewTags' ? 'Внешний вид' : 'Неисправность';
+  const tagText = val || btn.parentElement.childNodes[0]?.textContent?.trim() || '';
+  pushHistory('tag_remove', { field: fieldName, value: tagText });
+  btn.parentElement.remove();
+}
+
+function focusTagInput(id) {
+  document.getElementById(id).querySelector('input')?.focus();
+}
+
+// ─── FIELD TRACKING ────────────────────────────────────────────────
+function trackField(input, label) {
+  // Store original value on focus
+  input.addEventListener('focus', () => { input._origVal = input.value; });
+  input.addEventListener('change', () => {
+    const newVal = input.value.trim();
+    const oldVal = (input._origVal || '').trim();
+    if(newVal !== oldVal && newVal !== '') {
+      pushHistory('field', {
+        label: `Изменено: ${label}`,
+        meta: `${oldVal ? oldVal + ' → ' : ''}${newVal}\nИзменил: Sar. Anri`
+      });
+    }
+    input._origVal = newVal;
+  });
+}
+
+function trackSelect(sel, label) {
+  sel.addEventListener('change', () => {
+    pushHistory('field', {
+      label: `Изменено: ${label}`,
+      meta: `${sel.value}\nИзменил: Sar. Anri`
+    });
+  });
+}
+
+// Init field tracking after panel opens
+function initFieldTracking() {
+  const fields = [
+    ['clientName',   'Имя клиента'],
+    ['clientPhone',  'Телефон'],
+  ];
+  fields.forEach(([id, label]) => {
+    const el = document.getElementById(id);
+    if(el) trackField(el, label);
+  });
+
+  // All selects in panel form
+  const selLabels = ['Рекламный источник', 'Тип заказа', 'Марка', 'Модель', 'Комплектация', 'Мастер', 'Менеджер'];
+  document.querySelectorAll('#tab-info select').forEach((sel, i) => {
+    trackSelect(sel, selLabels[i] || 'Поле');
+  });
+
+  // All text inputs (textarea, input) in panel form except already tracked
+  document.querySelectorAll('#tab-info input[type="number"], #tab-info textarea, #tab-info input[type="datetime-local"]').forEach(el => {
+    const placeholder = el.placeholder || el.closest('.field')?.querySelector('label')?.textContent?.trim() || 'Поле';
+    trackField(el, placeholder);
+  });
+}
+
+// ─── MISC ─────────────────────────────────────────────────────────
+function saveOrder() {
+  const btn = event.target;
+  pushHistory('save', {});
+  btn.textContent = '✓ Сохранено';
+  btn.style.background = '#16a34a';
+  btn.style.color = '#fff';
+  btn.style.border = 'none';
+  setTimeout(() => {
+    btn.textContent = 'Сохранить';
+    btn.style.background = '';
+    btn.style.color = '';
+    btn.style.border = '';
+  }, 1800);
+}
+
+function sendChat(e) {
+  if(e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    sendChatMsg();
+  }
+}
+
+function sendChatMsg() {
+  const input = document.getElementById('chatInput');
+  const val = input.value.trim();
+  if(!val) return;
+  pushHistory('comment', { text: val, author: 'Sar. Anri' });
+  input.value = '';
+}
+
+function toggleNav(id) {
+  const sub = document.getElementById(id+'-sub');
+  const arr = document.getElementById(id+'-arr');
+  const open = sub.classList.toggle('open');
+  if(arr) arr.style.transform = open ? 'rotate(180deg)' : '';
+}
+
+function togglePrintMenu() {
+  document.getElementById('printMenu').classList.toggle('open');
+}
+// print menu handled above
+
+// Init works
+renderWorks();
+</script>
+</body>
+</html>
